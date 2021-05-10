@@ -1,4 +1,5 @@
 #include "hash_table.hpp"
+#include <iostream>
 
 #include <stdexcept>
 
@@ -18,16 +19,30 @@ namespace itis {
     }
 
     // Tip: allocate hash-table buckets
+
+    buckets_.resize(capacity);
   }
 
   std::optional<std::string> HashTable::Search(int key) const {
     // Tip: compute hash code (index) and use linear search
+    int ind = hash(key);
+    for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++)
+    {
+      if (iter->first == key)
+      {
+        std::cout << iter->first << std::endl;
+        return iter->second;
+      }
+    }
     return std::nullopt;
   }
 
   void HashTable::Put(int key, const std::string &value) {
     // Tip 1: compute hash code (index) to determine which bucket to use
+//    int index = hash(key);
     // Tip 2: consider the case when the key exists (read the docs in the header file)
+
+
 
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
