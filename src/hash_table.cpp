@@ -39,15 +39,47 @@ namespace itis {
 
   void HashTable::Put(int key, const std::string &value) {
     // Tip 1: compute hash code (index) to determine which bucket to use
-//    int index = hash(key);
+
+    int ind = hash(key);
     // Tip 2: consider the case when the key exists (read the docs in the header file)
+    std::optional<std::string> existing_value = Search(key);
 
-
+    if (existing_value)
+    {
+      for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++) {
+        if (iter->first == key)
+        {
+          std::cout << iter->first << std::endl;
+//          buckets_[ind].erase(iter);
+          iter->second = value;
+          break;
+        }
+      }
+//      std::pair<int, std::string> updated_value {key, value};
+//      buckets_[ind].push_back(updated_value);
+      return;
+    }
 
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
+      auto new_table = HashTable(static_cast<int>(buckets_.size()) + kGrowthCoefficient, load_factor_);
       // Tip 4: use utils::hash(key, size) to compute new indices for key-value pairs
+
+      for (auto bucket: buckets_)
+      {
+        for (auto item: bucket)
+        {
+          int new_hash = utils::hash(item.first, static_cast<int>(new_table.buckets_.size()));
+          new_table.buckets_[new_hash].push_back(item);
+        }
+      }
+      buckets_ = new_table.buckets_;
+      ind = hash(key);
     }
+
+    std::pair<int, std::string> new_item {key, value};
+    buckets_[ind].push_back(new_item);
+    num_keys_++;
   }
 
   std::optional<std::string> HashTable::Remove(int key) {
