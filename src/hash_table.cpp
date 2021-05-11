@@ -42,21 +42,17 @@ namespace itis {
 
     int ind = hash(key);
     // Tip 2: consider the case when the key exists (read the docs in the header file)
-    std::optional<std::string> existing_value = Search(key);
 
-    if (existing_value)
+    if (ContainsKey(key))
     {
       for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++) {
         if (iter->first == key)
         {
           std::cout << iter->first << std::endl;
-//          buckets_[ind].erase(iter);
           iter->second = value;
           break;
         }
       }
-//      std::pair<int, std::string> updated_value {key, value};
-//      buckets_[ind].push_back(updated_value);
       return;
     }
 
