@@ -80,7 +80,22 @@ namespace itis {
 
   std::optional<std::string> HashTable::Remove(int key) {
     // Tip 1: compute hash code (index) to determine which bucket to use
+    int ind = hash(key);
     // TIp 2: find the key-value pair to remove and make a copy of value to return
+    std::optional<std::string> item = Search(key);
+    if (item)
+    {
+      for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++)
+      {
+        if (iter->first == key)
+        {
+          std::string value {iter->second};
+          buckets_[ind].erase(iter);
+          num_keys_--;
+          return value;
+        }
+      }
+    }
     return std::nullopt;
   }
 
