@@ -30,7 +30,6 @@ namespace itis {
     {
       if (iter->first == key)
       {
-        std::cout << iter->first << std::endl;
         return iter->second;
       }
     }
@@ -48,7 +47,6 @@ namespace itis {
       for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++) {
         if (iter->first == key)
         {
-          std::cout << iter->first << std::endl;
           iter->second = value;
           break;
         }
@@ -58,14 +56,13 @@ namespace itis {
 
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
-      auto new_table = HashTable(static_cast<int>(buckets_.size()) + kGrowthCoefficient, load_factor_);
       // Tip 4: use utils::hash(key, size) to compute new indices for key-value pairs
-
+      auto new_table = HashTable(static_cast<int>(capacity() * kGrowthCoefficient), load_factor_);
       for (auto bucket: buckets_)
       {
         for (auto item: bucket)
         {
-          int new_hash = utils::hash(item.first, static_cast<int>(new_table.buckets_.size()));
+          int new_hash = utils::hash(item.first, new_table.capacity());
           new_table.buckets_[new_hash].push_back(item);
         }
       }
