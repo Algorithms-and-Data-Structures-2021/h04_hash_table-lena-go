@@ -54,25 +54,24 @@ namespace itis {
       return;
     }
 
+    std::pair<int, std::string> new_item {key, value};
+    buckets_[ind].push_back(new_item);
+    num_keys_++;
+
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
       // Tip 4: use utils::hash(key, size) to compute new indices for key-value pairs
       auto new_table = HashTable(static_cast<int>(capacity() * kGrowthCoefficient), load_factor_);
-      for (auto bucket: buckets_)
+      for (auto &bucket: buckets_)
       {
-        for (auto item: bucket)
+        for (auto &item: bucket)
         {
           int new_hash = utils::hash(item.first, new_table.capacity());
           new_table.buckets_[new_hash].push_back(item);
         }
       }
       buckets_ = new_table.buckets_;
-      ind = hash(key);
     }
-
-    std::pair<int, std::string> new_item {key, value};
-    buckets_[ind].push_back(new_item);
-    num_keys_++;
   }
 
   std::optional<std::string> HashTable::Remove(int key) {
