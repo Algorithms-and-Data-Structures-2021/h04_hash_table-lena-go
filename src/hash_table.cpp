@@ -1,6 +1,4 @@
 #include "hash_table.hpp"
-#include <iostream>
-
 #include <stdexcept>
 
 namespace itis {
