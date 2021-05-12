@@ -1,5 +1,4 @@
 #include "hash_table.hpp"
-
 #include <stdexcept>
 
 namespace itis {
@@ -18,26 +17,79 @@ namespace itis {
     }
 
     // Tip: allocate hash-table buckets
+
+    buckets_.resize(capacity);
   }
 
   std::optional<std::string> HashTable::Search(int key) const {
     // Tip: compute hash code (index) and use linear search
+    int ind = hash(key);
+    for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++)
+    {
+      if (iter->first == key)
+      {
+        return iter->second;
+      }
+    }
     return std::nullopt;
   }
 
   void HashTable::Put(int key, const std::string &value) {
     // Tip 1: compute hash code (index) to determine which bucket to use
+
+    int ind = hash(key);
     // Tip 2: consider the case when the key exists (read the docs in the header file)
+
+    if (ContainsKey(key))
+    {
+      for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++) {
+        if (iter->first == key)
+        {
+          iter->second = value;
+          break;
+        }
+      }
+      return;
+    }
+
+    std::pair<int, std::string> new_item {key, value};
+    buckets_[ind].push_back(new_item);
+    num_keys_++;
 
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
       // Tip 4: use utils::hash(key, size) to compute new indices for key-value pairs
+      auto new_table = HashTable(static_cast<int>(capacity() * kGrowthCoefficient), load_factor_);
+      for (auto &bucket: buckets_)
+      {
+        for (auto &item: bucket)
+        {
+          int new_hash = utils::hash(item.first, new_table.capacity());
+          new_table.buckets_[new_hash].push_back(item);
+        }
+      }
+      buckets_ = new_table.buckets_;
     }
   }
 
   std::optional<std::string> HashTable::Remove(int key) {
     // Tip 1: compute hash code (index) to determine which bucket to use
+    int ind = hash(key);
     // TIp 2: find the key-value pair to remove and make a copy of value to return
+    std::optional<std::string> item = Search(key);
+    if (item)
+    {
+      for (auto iter = buckets_[ind].begin(); iter != buckets_[ind].end(); iter++)
+      {
+        if (iter->first == key)
+        {
+          std::string value {iter->second};
+          buckets_[ind].erase(iter);
+          num_keys_--;
+          return value;
+        }
+      }
+    }
     return std::nullopt;
   }
 
